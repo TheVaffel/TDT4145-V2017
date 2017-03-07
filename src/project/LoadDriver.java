@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","******", "******" );
+					"jdbc:mysql://localhost:3306/treningsbase","admin", "admin" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -29,11 +29,11 @@ class LoadDriver{
 			System.out.println("Successfully connected to database!");
 			while(true){
 				scanner = new Scanner(System.in);
-				System.out.println("Hva vil du gjÃ¸re? \n" + String.format("%-50s", "Opprett ny treningsÃ¸kt") +  "- t\n"
-						+ String.format("%-50s", "Legge inn nye Ã¸velser") + "- o\n"
-						+ String.format("%-50s", "Liste opp tilgjengelige Ã¸velser") + "- l\n"
+				System.out.println("Hva vil du gjøre? \n" + String.format("%-50s", "Opprett ny treningsøkt") +  "- t\n"
+						+ String.format("%-50s", "Legge inn nye øvelser") + "- o\n"
+						+ String.format("%-50s", "Liste opp tilgjengelige øvelser") + "- l\n"
 						+ String.format("%-50s", "Vise statistikk for de siste 30 dagene") + "- s\n"
-						+ String.format("%-50s", "Vis beste treningsÃ¸kt") +  "- b\n");
+						+ String.format("%-50s", "Vis beste treningsøkt") +  "- b\n");
 				char c = scanner.nextLine().charAt(0);
 				
 				switch(c){
@@ -41,10 +41,12 @@ class LoadDriver{
 					//Opprett treningsÃ¸kt
 					break;
 				case 'o':
+					addExercise();
 					//Legg inn ny Ã¸velse
 					break;
 				case 'l':
 					//List opp Ã¸velser som er lagt inn
+					getAllExercises();
 					break;
 				case 's':
 					//Vis statistikk for de siste 30 dagene
@@ -65,6 +67,71 @@ class LoadDriver{
 		}
 	}  
 	
+	
+	
+	private static void getAllExercises() {
+		try {
+			Statement getEx=con.createStatement(); 
+			ResultSet ex=getEx.executeQuery("select * from ovelser");  
+			
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			System.out.printf("%-15s %-30s %-15s %-15s %-15s %n", "Navn", "Beskrivelse", "Belastning", "Repetisjoner", "Sett");
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			while(ex.next())  
+				System.out.printf("%-15s %-30s %-15d %-15d %-15d %n",ex.getString("Navn"), ex.getString("Beskrivelse"), 
+						ex.getInt("Belastning"), ex.getInt("Repetisjoner"), ex.getInt("Sett"));
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			System.out.println("\n \n");
+			getEx.close();
+			
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+		
+	}
+
+
+
+	private static void addExercise() {
+		scanner = new Scanner(System.in);
+		System.out.println("Du har valgt å legge til en øvelse \n"
+				+ "Vennligst skriv inn et unikt navn: ");
+		String navn = scanner.nextLine();
+		System.out.println("Beskrivelse: \n");
+		String beskr = scanner.nextLine();
+		System.out.println("Belastning: \n");
+		int belastning = Integer.parseInt(scanner.nextLine());
+		System.out.println("Repetisjoner: \n");
+		int rep = Integer.parseInt(scanner.nextLine());
+		System.out.println("Sett: \n");
+		int sett = Integer.parseInt(scanner.nextLine());
+		
+		Ovelse ov = new Ovelse(navn, beskr, belastning, rep, sett);
+		
+		try {
+			Statement stmt=con.createStatement(); 
+			
+			String sqlInsert = "INSERT INTO ovelser (navn, beskrivelse, belastning, repetisjoner, sett) " +
+	                   "VALUES ('"+ov.navn +"','"+ov.beskrivelse+"',"+
+	                   ov.belastning +","+ov.repetisjoner +
+	                   ","+ov.sett +");";
+	      stmt.executeUpdate(sqlInsert);
+	      stmt.close();
+			
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+		
+	}
+
+
+
 	public static void showStatistics() throws SQLException{
 		Calendar today = Calendar.getInstance();
 		today.set(Calendar.HOUR_OF_DAY, 0);
@@ -124,6 +191,23 @@ class LoadDriver{
 		}
 		rs.close();
 		System.out.print("\n\n");
+	}
+	
+	static class Ovelse{
+		public String navn;
+		public String beskrivelse;
+		public int belastning;
+		public int repetisjoner;
+		public int sett;
+		public float kalorierPerKilo;
+		
+		public Ovelse(String navn, String beskrivelse, int belastning, int repetisjoner, int sett){
+			this.navn = navn;
+			this.beskrivelse = beskrivelse;
+			this.belastning = belastning;
+			this.repetisjoner = repetisjoner;
+			this.sett = sett;
+		}
 	}
 	
 	
