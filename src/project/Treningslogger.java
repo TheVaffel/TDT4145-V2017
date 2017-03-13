@@ -17,10 +17,18 @@ class Treningslogger{
 	
 	public static void main(String args[]){  
 		try{  
-			Class.forName("com.mysql.jdbc.Driver");  
-			
+			Class.forName("com.mysql.jdbc.Driver"); 
+
+			scanner = new Scanner(System.in);
+			String username, password;
+			System.out.println("Skriv inn brukernavn til databasen: ");
+			username = scanner.nextLine();
+			System.out.println("Skriv inn passord: (blankt tilsier at det ikke er passord)");
+			password = scanner.nextLine();
+			if(password == "")
+				password = null;
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","******", "******" );
+					"jdbc:mysql://localhost:3306/treningsbase",username, password);
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -28,7 +36,6 @@ class Treningslogger{
 			con.close();  */
 			System.out.println("Successfully connected to database!");
 			while(true){
-				scanner = new Scanner(System.in);
 				System.out.println("Hva vil du gj�re? \n" + String.format("%-50s", "Opprett ny trenings�kt") +  "- t\n"
 						+ String.format("%-50s", "Legge inn nye �velser") + "- o\n"
 						+ String.format("%-50s", "Liste opp tilgjengelige �velser") + "- l\n"
