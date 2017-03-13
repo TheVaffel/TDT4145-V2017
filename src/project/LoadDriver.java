@@ -77,7 +77,7 @@ class LoadDriver{
 	private static void getAllExercises() {
 		try {
 			Statement getEx=con.createStatement(); 
-			ResultSet ex=getEx.executeQuery("select * from ovelser");  
+			ResultSet ex=getEx.executeQuery("select * from Ovelser");  
 			
 			for (int i = 0; i < 90; i++)
 				System.out.print("#");
@@ -103,50 +103,76 @@ class LoadDriver{
 
 	public static void addSession(){
 		boolean cont = true;
+		scanner = new Scanner(System.in);
+		System.out.println("Du har valgt å legge til en treningsøkt \n"
+				+"Skriv inn din unike brukerID: \n");
+		String brukerID = scanner.nextLine();
 		while(cont){
+			System.out.println("--------Økt--------\n");
 			// Får feil lengere ned dersom oktID ikke plasseres utenfor try-catch
 			int oktID = -1;
 			try{
 				Statement stmt=con.createStatement();
-				ResultSet rs=stmt.executeQuery("select max(oktID) from Treningsokter;");
+				ResultSet rs=stmt.executeQuery("SELECT MAX(oktID) from Treningsokter;");
+				rs.next();
 				oktID = rs.getInt(1);
-				stmt.close();
 				oktID += 1;
+				stmt.close();
 			} catch (SQLException sqle) {
 				sqle.printStackTrace();
 			}
-			scanner = new Scanner(System.in);
-			System.out.println("Du har valgt å legge til en treningsøkt \n");
-			System.out.println("Skriv inn din unike brukerID: \n");
-			int brukerID = scanner.nextInt();
 			System.out.println("Tid (HH:MM:SS): \n");
 			String tid = scanner.nextLine();
 			System.out.println("Dato (YYYY-MM-DD): \n");
 			String dato = scanner.nextLine();
-			System.out.println("Form: \n");
-			int form = scanner.nextInt();
-			System.out.println("Prestasjon: \n");
-			int prestasjon = scanner.nextInt();
-			System.out.println("Notater til treningsøkten: \n");
+			System.out.println("Form (1-10): \n");
+			int form = Integer.parseInt(scanner.nextLine());
+			System.out.println("Prestasjon (1-10): \n");
+			int prestasjon = Integer.parseInt(scanner.nextLine());
+			System.out.println("Notater til treningsøkten: ");
 			String notat = scanner.nextLine();
-			
 			Treningsokt okt = new Treningsokt(oktID, tid, dato, form, prestasjon, notat, brukerID);
 			
 			try {
 				Statement stmt=con.createStatement(); 
-				
-				String sqlInsert = "INSERT INTO Treningsokter (oktID, tid, dato, form, prestasjon, notat, brukerID) " +
-		                   "VALUES ('"+okt.oktID +"','"+okt.tid+"',"+
-		                   okt.dato +","+okt.form +
-		                   ","+okt.prestasjon +" ,"+okt.notat +","+ okt.brukerID+");";
+				String sqlInsert = "INSERT INTO Treningsokter " +
+		                   "VALUES ("+okt.oktID +",'"+okt.tid+"','"+
+		                   okt.dato +"',"+okt.form +
+		                   ","+okt.prestasjon +" ,'"+okt.notat +"','"+ okt.brukerID+"');";
 		      stmt.executeUpdate(sqlInsert);
 		      stmt.close();
 				
 			} catch (SQLException sqle) {
 				sqle.printStackTrace();
 			}
+			boolean ovBool = true;
+			System.out.print("Hvilken øvelse gjorde du? \n");
+			do{
+				System.out.println("Øvelse: \n");
+				String navn = scanner.nextLine();
+				System.out.println("Tid (float): \n");
+				float ovTid = Float.parseFloat(scanner.nextLine());
+				System.out.println("Lendge: \n");
+				float lengde = Float.parseFloat(scanner.nextLine());
+				try {
+					Statement stmt=con.createStatement(); 
+					String sqlInsert = "INSERT INTO Ovelsesresultater " +
+			                   "VALUES ("+okt.oktID +",'"+ navn +"', "+ovTid+", "+
+			                   lengde + ");";
+			      stmt.executeUpdate(sqlInsert);
+			      stmt.close();
+					
+				} catch (SQLException sqle) {
+					sqle.printStackTrace();
+				}
+				System.out.println("Vil du legge til en til? (1/0): \n");
+				int svar = Integer.parseInt(scanner.nextLine());
+				ovBool = (1 == svar);
+			}
+			while(ovBool);
+			
 			System.out.print("Vil du legge inn en økt til? (1/0): \n");
-			int answer = scanner.nextInt();
+			int answer = Integer.parseInt(scanner.nextLine());
 			cont = (1 == answer);
 		}
 	}
@@ -170,7 +196,7 @@ class LoadDriver{
 		try {
 			Statement stmt=con.createStatement(); 
 			
-			String sqlInsert = "INSERT INTO ovelser (navn, beskrivelse, belastning, repetisjoner, sett) " +
+			String sqlInsert = "INSERT INTO Ovelser (navn, beskrivelse, belastning, repetisjoner, sett) " +
 	                   "VALUES ('"+ov.navn +"','"+ov.beskrivelse+"',"+
 	                   ov.belastning +","+ov.repetisjoner +
 	                   ","+ov.sett +");";
@@ -344,14 +370,14 @@ public static void showBestWorkout() throws SQLException{
 	
 	static class Treningsokt{
 		public int oktID;
-		public int brukerID;
+		public String brukerID;
 		public String tid;
 		public String dato;
 		public int form;
 		public int prestasjon;
 		public String notat;
 		
-		public Treningsokt(int oktID, String tid, String dato, int form, int prestasjon, String notat, int brukerID){
+		public Treningsokt(int oktID, String tid, String dato, int form, int prestasjon, String notat, String brukerID){
 			this.oktID = oktID;
 			this.brukerID = brukerID;
 			this.tid = tid;
@@ -359,28 +385,6 @@ public static void showBestWorkout() throws SQLException{
 			this.form = form;
 			this.prestasjon = prestasjon;
 			this.notat = notat;
-		}
-		
-		public String getTid(){
-			// Skal jeg her konvertere til double
-			return tid;
-		}
-		
-		public String getDato(){
-			// Samme som over
-			return dato;
-		}
-		
-		public int getForm(){
-			return form;
-		}
-		
-		public int getPrestasjon(){
-			return prestasjon;
-		}
-		
-		public String getNotat(){
-			return notat;
 		}
 	}
 }
