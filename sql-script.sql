@@ -85,4 +85,8 @@ INSERT INTO Ovelser VALUES('Langsykling', 'Sykkeltur på over 30 km', 7, 1, 1, 1
 INSERT INTO Ovelser VALUES('Maraton', 'Lang loepetur', 8, 1, 1, 176.54);
 INSERT INTO Ovelser VALUES('Korte Intervaller', 'Intervalltrening med korte intervaller og mange repetisjoner', 9, 5, 3, 200);
 
-
+INSERT INTO Brukere VALUES('test', 50, 1.80, 1998, 'M');
+INSERT INTO Treningsokter VALUES(0, "10:00:00", "20170101", 5, 5, 'Helt ok', 'test');
+INSERT INTO Treningsokter VALUES(1, "10:00:05", "20170102", 6, 8, 'Var bedre', 'test');
+INSERT INTO Treningsokter VALUES(2, "10:00:05", "20170302", 6, 6, 'Ok', 'test');
+INSERT INTO Treningsokter VALUES(3, "10:00:05", "20170305", 7, 7, 'Hui', 'test');
