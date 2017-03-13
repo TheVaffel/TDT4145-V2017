@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","******", "******" );
+					"jdbc:mysql://localhost:3306/treningsbase","hkon20", "kkk111" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -38,7 +38,7 @@ class LoadDriver{
 				
 				switch(c){
 				case 't':
-					//Opprett treningsøkt
+					addSession();
 					break;
 				case 'o':
 					addExercise();
@@ -96,7 +96,55 @@ class LoadDriver{
 		
 	}
 
-
+	public static void addSession(){
+		boolean cont = true;
+		while(cont){
+			// Får feil lengere ned dersom oktID ikke plasseres utenfor try-catch
+			int oktID = -1;
+			try{
+				Statement stmt=con.createStatement();
+				ResultSet rs=stmt.executeQuery("select max(oktID) from Treningsokter;");
+				oktID = rs.getInt(1);
+				stmt.close();
+				oktID += 1;
+			} catch (SQLException sqle) {
+				sqle.printStackTrace();
+			}
+			scanner = new Scanner(System.in);
+			System.out.println("Du har valgt å legge til en treningsøkt \n");
+			System.out.println("Skriv inn din unike brukerID: \n");
+			int brukerID = scanner.nextInt();
+			System.out.println("Tid (HH:MM:SS): \n");
+			String tid = scanner.nextLine();
+			System.out.println("Dato (YYYY-MM-DD): \n");
+			String dato = scanner.nextLine();
+			System.out.println("Form: \n");
+			int form = scanner.nextInt();
+			System.out.println("Prestasjon: \n");
+			int prestasjon = scanner.nextInt();
+			System.out.println("Notater til treningsøkten: \n");
+			String notat = scanner.nextLine();
+			
+			Treningsokt okt = new Treningsokt(oktID, tid, dato, form, prestasjon, notat, brukerID);
+			
+			try {
+				Statement stmt=con.createStatement(); 
+				
+				String sqlInsert = "INSERT INTO Treningsokter (oktID, tid, dato, form, prestasjon, notat, brukerID) " +
+		                   "VALUES ('"+okt.oktID +"','"+okt.tid+"',"+
+		                   okt.dato +","+okt.form +
+		                   ","+okt.prestasjon +" ,"+okt.notat +","+ okt.brukerID+");";
+		      stmt.executeUpdate(sqlInsert);
+		      stmt.close();
+				
+			} catch (SQLException sqle) {
+				sqle.printStackTrace();
+			}
+			System.out.print("Vil du legge inn en økt til? (1/0): \n");
+			int answer = scanner.nextInt();
+			cont = (1 == answer);
+		}
+	}
 
 	private static void addExercise() {
 		scanner = new Scanner(System.in);
@@ -335,6 +383,48 @@ public static void showBestWorkout() throws SQLException{
 		
 		public double getTid(){
 			return tid;
+		}
+	}
+	
+	static class Treningsokt{
+		public int oktID;
+		public int brukerID;
+		public String tid;
+		public String dato;
+		public int form;
+		public int prestasjon;
+		public String notat;
+		
+		public Treningsokt(int oktID, String tid, String dato, int form, int prestasjon, String notat, int brukerID){
+			this.oktID = oktID;
+			this.brukerID = brukerID;
+			this.tid = tid;
+			this.dato = dato;
+			this.form = form;
+			this.prestasjon = prestasjon;
+			this.notat = notat;
+		}
+		
+		public String getTid(){
+			// Skal jeg her konvertere til double
+			return tid;
+		}
+		
+		public String getDato(){
+			// Samme som over
+			return dato;
+		}
+		
+		public int getForm(){
+			return form;
+		}
+		
+		public int getPrestasjon(){
+			return prestasjon;
+		}
+		
+		public String getNotat(){
+			return notat;
 		}
 	}
 }
