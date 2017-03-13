@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;  
 
-class LoadDriver{  
+class Treningslogger{  
 	
 	static Scanner scanner;
 	static Connection con;
