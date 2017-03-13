@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","****", "****" );
+					"jdbc:mysql://localhost:3306/treningsbase","******", "******" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -33,8 +33,9 @@ class LoadDriver{
 						+ String.format("%-50s", "Legge inn nye �velser") + "- o\n"
 						+ String.format("%-50s", "Liste opp tilgjengelige �velser") + "- l\n"
 						+ String.format("%-50s", "Vise statistikk for de siste 30 dagene") + "- s\n"
-						+ String.format("%-50s", "Vis beste trenings�kt") +  "- b\n");
-				char c = scanner.nextLine().charAt(0);
+						+ String.format("%-50s", "Vis beste trenings�kt") +  "- b\n"
+						+ String.format("%-50s", "Avslutte") +  "- a\n");
+				char c = scanner.nextLine().toLowerCase().charAt(0);
 				
 				switch(c){
 				case 't':
@@ -55,6 +56,10 @@ class LoadDriver{
 				case 'b':
 					showBestWorkout();
 					break;
+				case 'a':
+				case 'q':
+				case 'x':
+					return;
 				}
 			}
 		}catch(Exception e){ System.out.println(e);}
