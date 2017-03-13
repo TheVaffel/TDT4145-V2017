@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/prosjekt2","****", "****" );
+					"jdbc:mysql://localhost:3306/treningsbase","****", "****" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -250,16 +250,32 @@ public static void showBestWorkout() throws SQLException{
 				+ String.format("%-50s", "Beste form") + "- f\n"
 				+ String.format("%-50s", "Beste prestasjon") +  "- p\n");
 		char c = scanner.nextLine().charAt(0);
+		Statement s1 = con.createStatement();
+		
 		Statement s2 = con.createStatement();
 		ResultSet beste;
 		ResultSet besteTrening;
+		beste= s1.executeQuery("SELECT COUNT(*) FROM Treningsokter"); 
+		beste.next();
+		if (beste.getInt(1)==0){
+			System.out.println("ingen treningsøkter er registrert \n");
+			return;
+		}
+		s1.close();
 		switch(c){
 		case 'f':
 			beste= s2.executeQuery("SELECT MAX( form ) FROM Treningsokter"); 
+					
+			System.out.println("\n Treningsøkter med beste form : ");
 			while(beste.next()){
 				int bestForm=beste.getInt(1);
 				Statement  s3 = con.createStatement();
 				besteTrening= s3.executeQuery("SELECT * FROM Treningsokter " + "where form = " + bestForm);
+				besteTrening.next();
+
+				System.out.println("dato: " + besteTrening.getDate("dato") + "form: " + besteTrening.getInt("form"));
+				System.out.print("\n\n");
+				
 				s3.close();
 			}
 			s2.close();
@@ -270,6 +286,8 @@ public static void showBestWorkout() throws SQLException{
 				int bestPrestasjon=beste.getInt(1);
 				Statement  s3 = con.createStatement();
 				besteTrening= s3.executeQuery("SELECT * FROM Treningsokter " + "where prestasjon = " + bestPrestasjon);
+				System.out.println("dato: " + besteTrening.getDate("dato") + "form: " + besteTrening.getInt("form"));
+				System.out.print("\n\n");
 				s3.close();
 			}
 			s2.close();
