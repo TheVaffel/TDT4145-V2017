@@ -286,7 +286,8 @@ public static void showBestWorkout() throws SQLException{
 				int bestPrestasjon=beste.getInt(1);
 				Statement  s3 = con.createStatement();
 				besteTrening= s3.executeQuery("SELECT * FROM Treningsokter " + "where prestasjon = " + bestPrestasjon);
-				System.out.println("dato: " + besteTrening.getDate("dato") + "form: " + besteTrening.getInt("form"));
+				besteTrening.next();
+				System.out.println("dato: " + besteTrening.getDate("dato") + " prestasjon: " + besteTrening.getInt("prestasjon"));
 				System.out.print("\n\n");
 				s3.close();
 			}
