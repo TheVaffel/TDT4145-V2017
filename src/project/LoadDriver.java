@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","hkon20", "kkk111" );
+					"jdbc:mysql://localhost:3306/prosjekt2","****", "****" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -243,106 +243,38 @@ class LoadDriver{
 	
 public static void showBestWorkout() throws SQLException{
 		
-		try {
-			Statement getEx=con.createStatement(); 
-			ResultSet ex=getEx.executeQuery("select * from ovelser");  
-			
-			for (int i = 0; i < 90; i++)
-				System.out.print("#");
-			System.out.println();
-			System.out.printf("%-15s %n", "Velg ovelse");
-			for (int i = 0; i < 90; i++)
-				System.out.print("#");
-			System.out.println();
-			while(ex.next())  
-				System.out.printf("%-15s %n",ex.getString("Navn"));
-			for (int i = 0; i < 90; i++)
-				System.out.print("#");
-			System.out.println();
-			System.out.println("\n \n");
-			getEx.close();
-			
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-		}
-		scanner = new Scanner(System.in);
-		String ovelse = scanner.nextLine();
-		
 		Statement stmt=con.createStatement();  
-		ResultSet rs=stmt.executeQuery("select * from Treningsokter" + 
-				"where ovelse =" + ovelse); 
+		ResultSet rs=stmt.executeQuery("select * from Treningsokter"); 
 		scanner = new Scanner(System.in);
-		System.out.println("Hva vil du finne beste av? \n" + String.format("%-50s", "Opprett ny treningsøkt") +  "- t\n"
-				+ String.format("%-50s", "Lengste distanse") + "- d\n"
-				+ String.format("%-50s", "lengste treningsøkt i tid") +  "- t\n");
-		char c = scanner.nextLine().charAt(0);	
-		Ovelsesresultat BestOv = new Ovelsesresultat();
-		Date dateBestOv;
-		double best = 0;
+		System.out.println("Hva vil du finne beste av? \n" 
+				+ String.format("%-50s", "Beste form") + "- f\n"
+				+ String.format("%-50s", "Beste prestasjon") +  "- p\n");
+		char c = scanner.nextLine().charAt(0);
+		Statement s2 = con.createStatement();
+		ResultSet beste;
+		ResultSet besteTrening;
 		switch(c){
-		case 't':
-		while(rs.next()) {
-			int i = rs.getInt(1);
-			Statement stmt2 = con.createStatement();
-			ResultSet crs = stmt2.executeQuery("select * from Ovelsesresultater " + 
-					"where oktId=" + i);
-			double totalDistance = 0;
-			double totalTime = 0;
-			while(crs.next()){
-
-				Ovelsesresultat ov = new Ovelsesresultat();
-				
-				ov.tid =  crs.getDouble("tid");
-				totalTime += ov.tid;
-				ov.lengde = crs.getDouble("lengde");
-				totalDistance += ov.lengde;
-				//System.out.println("Ovelse: " + s);
+		case 'f':
+			beste= s2.executeQuery("SELECT MAX( form ) FROM Treningsokter"); 
+			while(beste.next()){
+				int bestForm=beste.getInt(1);
+				Statement  s3 = con.createStatement();
+				besteTrening= s3.executeQuery("SELECT * FROM Treningsokter " + "where form = " + bestForm);
+				s3.close();
 			}
-			crs.last();
-			crs.close();
-			
-			if (totalTime>=best){
-				BestOv.tid=totalTime;
-				BestOv.lengde=totalDistance;
+			s2.close();
+			break;
+		case 'p':
+			beste= s2.executeQuery("SELECT MAX(prestasjon) FROM Treningsokter"); 
+			while(beste.next()){
+				int bestPrestasjon=beste.getInt(1);
+				Statement  s3 = con.createStatement();
+				besteTrening= s3.executeQuery("SELECT * FROM Treningsokter " + "where prestasjon = " + bestPrestasjon);
+				s3.close();
 			}
+			s2.close();
+			break;
 		}
-		rs.last();
-		case 'd':
-			while(rs.next()) {
-				int i = rs.getInt(1);
-				Statement stmt2 = con.createStatement();
-				ResultSet crs = stmt2.executeQuery("select * from Ovelsesresultater " + 
-						"where oktId=" + i);
-				double totalDistance = 0;
-				double totalTime = 0;
-				while(crs.next()){
-
-					Ovelsesresultat ov = new Ovelsesresultat();
-					
-					ov.tid =  crs.getDouble("tid");
-					totalTime += ov.tid;
-					ov.lengde = crs.getDouble("lengde");
-					totalDistance += ov.lengde;
-					//System.out.println("Ovelse: " + s);
-				}
-				crs.last();
-				crs.close();
-				
-				if (totalDistance>=best){
-					BestOv.tid=totalTime;
-					BestOv.lengde=totalDistance;
-				}
-			}
-			rs.last();
-		}
-	//	double time =  BestOv.getDouble("tid");
-	//	double lengde = BestOv.getDouble("lengde");
-		
-//		System.out.println(
-//				+ String.format("%-50s", "beste økten med "+ ovelse) + "\n"
-//				+ String.format("%-50s", "Ble gjennomført "+ dateBestOv) + "\n"
-//				+ String.format("%-50s", "distanse: "+ lengde) + "\n"
-//				+ String.format("%-50s", "tid: "+ time) +  "\n");	
 
 		rs.close();
 		System.out.print("\n\n");
