@@ -20,7 +20,7 @@ class LoadDriver{
 			Class.forName("com.mysql.jdbc.Driver");  
 			
 			con=DriverManager.getConnection(  
-					"jdbc:mysql://localhost:3306/treningsbase","****", "****" );
+					"jdbc:mysql://localhost:3306/treningsbase","******", "******" );
 			/*Statement stmt=con.createStatement();  
 			ResultSet rs=stmt.executeQuery("select * from Treningsokter");  
 			while(rs.next())  
@@ -29,11 +29,11 @@ class LoadDriver{
 			System.out.println("Successfully connected to database!");
 			while(true){
 				scanner = new Scanner(System.in);
-				System.out.println("Hva vil du gjøre? \n" + String.format("%-50s", "Opprett ny treningsøkt") +  "- t\n"
-						+ String.format("%-50s", "Legge inn nye øvelser") + "- o\n"
-						+ String.format("%-50s", "Liste opp tilgjengelige øvelser") + "- l\n"
+				System.out.println("Hva vil du gjï¿½re? \n" + String.format("%-50s", "Opprett ny treningsï¿½kt") +  "- t\n"
+						+ String.format("%-50s", "Legge inn nye ï¿½velser") + "- o\n"
+						+ String.format("%-50s", "Liste opp tilgjengelige ï¿½velser") + "- l\n"
 						+ String.format("%-50s", "Vise statistikk for de siste 30 dagene") + "- s\n"
-						+ String.format("%-50s", "Vis beste treningsøkt") +  "- b\n");
+						+ String.format("%-50s", "Vis beste treningsï¿½kt") +  "- b\n");
 				char c = scanner.nextLine().charAt(0);
 				
 				switch(c){
@@ -53,7 +53,7 @@ class LoadDriver{
 					showStatistics();
 					break;
 				case 'b':
-					//Vis beste treningsÃ¸kt
+					showBestWorkout();
 					break;
 				}
 			}
@@ -100,7 +100,7 @@ class LoadDriver{
 
 	private static void addExercise() {
 		scanner = new Scanner(System.in);
-		System.out.println("Du har valgt å legge til en øvelse \n"
+		System.out.println("Du har valgt ï¿½ legge til en ï¿½velse \n"
 				+ "Vennligst skriv inn et unikt navn: ");
 		String navn = scanner.nextLine();
 		System.out.println("Beskrivelse: \n");
@@ -192,6 +192,114 @@ class LoadDriver{
 		rs.close();
 		System.out.print("\n\n");
 	}
+	
+public static void showBestWorkout() throws SQLException{
+		
+		try {
+			Statement getEx=con.createStatement(); 
+			ResultSet ex=getEx.executeQuery("select * from ovelser");  
+			
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			System.out.printf("%-15s %n", "Velg ovelse");
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			while(ex.next())  
+				System.out.printf("%-15s %n",ex.getString("Navn"));
+			for (int i = 0; i < 90; i++)
+				System.out.print("#");
+			System.out.println();
+			System.out.println("\n \n");
+			getEx.close();
+			
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
+		scanner = new Scanner(System.in);
+		String ovelse = scanner.nextLine();
+		
+		Statement stmt=con.createStatement();  
+		ResultSet rs=stmt.executeQuery("select * from Treningsokter" + 
+				"where ovelse =" + ovelse); 
+		scanner = new Scanner(System.in);
+		System.out.println("Hva vil du finne beste av? \n" + String.format("%-50s", "Opprett ny treningsÃ¸kt") +  "- t\n"
+				+ String.format("%-50s", "Lengste distanse") + "- d\n"
+				+ String.format("%-50s", "lengste treningsÃ¸kt i tid") +  "- t\n");
+		char c = scanner.nextLine().charAt(0);	
+		Ovelsesresultat BestOv = new Ovelsesresultat();
+		Date dateBestOv;
+		double best = 0;
+		switch(c){
+		case 't':
+		while(rs.next()) {
+			int i = rs.getInt(1);
+			Statement stmt2 = con.createStatement();
+			ResultSet crs = stmt2.executeQuery("select * from Ovelsesresultater " + 
+					"where oktId=" + i);
+			double totalDistance = 0;
+			double totalTime = 0;
+			while(crs.next()){
+
+				Ovelsesresultat ov = new Ovelsesresultat();
+				
+				ov.tid =  crs.getDouble("tid");
+				totalTime += ov.tid;
+				ov.lengde = crs.getDouble("lengde");
+				totalDistance += ov.lengde;
+				//System.out.println("Ovelse: " + s);
+			}
+			crs.last();
+			crs.close();
+			
+			if (totalTime>=best){
+				BestOv.tid=totalTime;
+				BestOv.lengde=totalDistance;
+			}
+		}
+		rs.last();
+		case 'd':
+			while(rs.next()) {
+				int i = rs.getInt(1);
+				Statement stmt2 = con.createStatement();
+				ResultSet crs = stmt2.executeQuery("select * from Ovelsesresultater " + 
+						"where oktId=" + i);
+				double totalDistance = 0;
+				double totalTime = 0;
+				while(crs.next()){
+
+					Ovelsesresultat ov = new Ovelsesresultat();
+					
+					ov.tid =  crs.getDouble("tid");
+					totalTime += ov.tid;
+					ov.lengde = crs.getDouble("lengde");
+					totalDistance += ov.lengde;
+					//System.out.println("Ovelse: " + s);
+				}
+				crs.last();
+				crs.close();
+				
+				if (totalDistance>=best){
+					BestOv.tid=totalTime;
+					BestOv.lengde=totalDistance;
+				}
+			}
+			rs.last();
+		}
+	//	double time =  BestOv.getDouble("tid");
+	//	double lengde = BestOv.getDouble("lengde");
+		
+//		System.out.println(
+//				+ String.format("%-50s", "beste Ã¸kten med "+ ovelse) + "\n"
+//				+ String.format("%-50s", "Ble gjennomfÃ¸rt "+ dateBestOv) + "\n"
+//				+ String.format("%-50s", "distanse: "+ lengde) + "\n"
+//				+ String.format("%-50s", "tid: "+ time) +  "\n");	
+
+		rs.close();
+		System.out.print("\n\n");
+	}
+
 	
 	static class Ovelse{
 		public String navn;
