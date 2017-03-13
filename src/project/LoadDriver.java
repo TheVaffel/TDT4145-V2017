@@ -226,7 +226,7 @@ class LoadDriver{
 		int minutes = (int)totalTime - 60*hours;
 		System.out.println("De siste 30 dagene: ");
 		System.out.println("Det var totalt " + totalNumberOkts + " øvelser fordelt på " + totalNumberTrainings + " økter");
-		System.out.println("Totalt ble det løpt " + formatter.format(totalDistance) + " km på " + hours + " timer og " + minutes + " minutter");
+		System.out.println("Totalt var det en forflytning på " + formatter.format(totalDistance) + " km på " + hours + " timer og " + minutes + " minutter");
 		System.out.println("Det betyr en gjennomsnittshastighet på " + formatter.format(totalDistance/hours) + "km/t!");
 		
 		Map<String, Long> counts = 
